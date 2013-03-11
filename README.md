@@ -16,34 +16,34 @@ include hasher instanciation and sequence finalization.
 
 <pre>
 
-Benchmark32_1      20000000     118 ns/op           8.46 MB/s 
-Benchmark32_2      20000000     134 ns/op          14.88 MB/s 
-Benchmark32_4      20000000     116 ns/op          34.21 MB/s 
-Benchmark32_8      20000000     118 ns/op          67.65 MB/s 
-Benchmark32_16     20000000     121 ns/op         131.31 MB/s 
-Benchmark32_32     20000000     129 ns/op         246.21 MB/s 
-Benchmark32_64     10000000     145 ns/op         440.35 MB/s 
-Benchmark32_128    10000000     177 ns/op         723.01 MB/s 
-Benchmark32_256    10000000     246 ns/op        1037.15 MB/s 
-Benchmark32_512     5000000     375 ns/op        1363.39 MB/s 
-Benchmark32_1024    5000000     627 ns/op        1631.87 MB/s 
-Benchmark32_2048    1000000    1105 ns/op        1853.38 MB/s 
-Benchmark32_4096    1000000    2091 ns/op        1958.09 MB/s 
-Benchmark32_8192     500000    4062 ns/op        2016.45 MB/s 
+Benchmark32_1        50000000        26.7 ns/op        37.47 MB/s
+Benchmark32_2       100000000        28.2 ns/op        70.95 MB/s
+Benchmark32_4       100000000        26.4 ns/op       151.56 MB/s
+Benchmark32_8        50000000        29.0 ns/op       275.42 MB/s
+Benchmark32_16       50000000        32.3 ns/op       495.74 MB/s
+Benchmark32_32       50000000        39.1 ns/op       818.67 MB/s
+Benchmark32_64       50000000        54.1 ns/op      1182.40 MB/s
+Benchmark32_128      20000000        84.3 ns/op      1518.96 MB/s
+Benchmark32_256      10000000       150.0 ns/op      1700.58 MB/s
+Benchmark32_512      10000000       272.0 ns/op      1877.52 MB/s
+Benchmark32_1024      5000000       520.0 ns/op      1968.68 MB/s
+Benchmark32_2048      1000000      1012.0 ns/op      2022.71 MB/s
+Benchmark32_4096      1000000      1998.0 ns/op      2049.31 MB/s
+Benchmark32_8192       500000      3973.0 ns/op      2061.41 MB/s
 
-Benchmark128_1     20000000     122 ns/op           8.14 MB/s 
-Benchmark128_2     10000000     138 ns/op          14.48 MB/s 
-Benchmark128_4     10000000     159 ns/op          25.01 MB/s 
-Benchmark128_8     10000000     143 ns/op          55.92 MB/s 
-Benchmark128_16    20000000     122 ns/op         131.09 MB/s 
-Benchmark128_32    20000000     125 ns/op         254.00 MB/s 
-Benchmark128_64    20000000     133 ns/op         479.22 MB/s 
-Benchmark128_128   10000000     149 ns/op         856.81 MB/s 
-Benchmark128_256   10000000     181 ns/op        1408.09 MB/s 
-Benchmark128_512   10000000     240 ns/op        2132.96 MB/s 
-Benchmark128_1024   5000000     360 ns/op        2843.22 MB/s 
-Benchmark128_2048   5000000     606 ns/op        3374.67 MB/s 
-Benchmark128_4096   1000000    1064 ns/op        3849.06 MB/s 
-Benchmark128_8192   1000000    1994 ns/op        4106.64 MB/s 
+Benchmark128_1       50000000        33.2 ns/op        30.15 MB/s
+Benchmark128_2       50000000        33.3 ns/op        59.99 MB/s
+Benchmark128_4       50000000        35.4 ns/op       112.88 MB/s
+Benchmark128_8       50000000        36.6 ns/op       218.30 MB/s
+Benchmark128_16      50000000        35.5 ns/op       450.86 MB/s
+Benchmark128_32      50000000        35.3 ns/op       905.84 MB/s
+Benchmark128_64      50000000        44.3 ns/op      1443.76 MB/s
+Benchmark128_128     50000000        58.2 ns/op      2201.02 MB/s
+Benchmark128_256     20000000        85.3 ns/op      2999.88 MB/s
+Benchmark128_512     10000000       142.0 ns/op      3592.97 MB/s
+Benchmark128_1024    10000000       258.0 ns/op      3963.74 MB/s
+Benchmark128_2048     5000000       494.0 ns/op      4144.65 MB/s
+Benchmark128_4096     2000000       955.0 ns/op      4285.80 MB/s
+Benchmark128_8192     1000000      1884.0 ns/op      4347.12 MB/s
 
 </pre>

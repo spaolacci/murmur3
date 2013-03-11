@@ -96,3 +96,15 @@ func rotl32(x uint32, r byte) uint32 {
 	return (x << r) | (x >> (32 - r))
 }
 */
+
+// Sum32 returns the MurmurHash3 sum of data. It is equivalent to the
+// following sequence (without the extra burden and the extra allocation):
+//     hasher := New32()
+//     hasher.Write(data)
+//     return hasher.Sum32()
+func Sum32(data []byte) uint32 {
+	d := &digest32{h1: 1}
+	d.tail = d.bmix(data)
+	d.clen = len(data)
+	return d.Sum32()
+}
