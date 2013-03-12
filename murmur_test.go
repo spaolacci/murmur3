@@ -2,7 +2,6 @@ package murmur3
 
 import (
 	"hash"
-	"runtime"
 	"testing"
 )
 
@@ -28,6 +27,10 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
 		}
 
+		if v := Sum32([]byte(elem.s)); v != elem.h32 {
+			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
+		}
+
 		var h64 hash.Hash64 = New64()
 		h64.Write([]byte(elem.s))
 		if v := h64.Sum64(); v != elem.h64_1 {
@@ -37,6 +40,10 @@ func TestRef(t *testing.T) {
 		var h128 Hash128 = New128()
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
+			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+		}
+
+		if v1, v2 := Sum128([]byte(elem.s)); v1 != elem.h64_1 || v2 != elem.h64_2 {
 			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
 		}
 	}
@@ -69,14 +76,11 @@ func TestIncremental(t *testing.T) {
 //---
 
 func bench32(b *testing.B, length int) {
-	runtime.GC()
 	buf := make([]byte, length)
 	b.SetBytes(int64(length))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		hasher := New32()
-		hasher.Write(buf)
-		hasher.Sum32()
+		Sum32(buf)
 	}
 }
 
@@ -167,14 +171,11 @@ func BenchmarkPartial32_128(b *testing.B) {
 //---
 
 func bench128(b *testing.B, length int) {
-	runtime.GC()
 	buf := make([]byte, length)
 	b.SetBytes(int64(length))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		hasher := New128()
-		hasher.Write(buf)
-		hasher.Sum128()
+		Sum128(buf)
 	}
 }
 
