@@ -16,20 +16,20 @@ include hasher instanciation and sequence finalization.
 
 <pre>
 
-Benchmark32_1        50000000        26.7 ns/op        37.47 MB/s
-Benchmark32_2       100000000        28.2 ns/op        70.95 MB/s
-Benchmark32_4       100000000        26.4 ns/op       151.56 MB/s
-Benchmark32_8        50000000        29.0 ns/op       275.42 MB/s
-Benchmark32_16       50000000        32.3 ns/op       495.74 MB/s
-Benchmark32_32       50000000        39.1 ns/op       818.67 MB/s
-Benchmark32_64       50000000        54.1 ns/op      1182.40 MB/s
-Benchmark32_128      20000000        84.3 ns/op      1518.96 MB/s
-Benchmark32_256      10000000       150.0 ns/op      1700.58 MB/s
-Benchmark32_512      10000000       272.0 ns/op      1877.52 MB/s
-Benchmark32_1024      5000000       520.0 ns/op      1968.68 MB/s
-Benchmark32_2048      1000000      1012.0 ns/op      2022.71 MB/s
-Benchmark32_4096      1000000      1998.0 ns/op      2049.31 MB/s
-Benchmark32_8192       500000      3973.0 ns/op      2061.41 MB/s
+Benchmark32_1       200000000         8.4 ns/op       119.39 MB/s
+Benchmark32_2       200000000         9.5 ns/op       211.69 MB/s
+Benchmark32_4       500000000         7.9 ns/op       506.24 MB/s
+Benchmark32_8       200000000         9.4 ns/op       853.40 MB/s
+Benchmark32_16      100000000        12.1 ns/op      1324.19 MB/s
+Benchmark32_32      100000000        18.2 ns/op      1760.81 MB/s
+Benchmark32_64       50000000        31.2 ns/op      2051.59 MB/s
+Benchmark32_128      50000000        58.7 ns/op      2180.34 MB/s
+Benchmark32_256      20000000       116.0 ns/op      2194.85 MB/s
+Benchmark32_512      10000000       227.0 ns/op      2247.43 MB/s
+Benchmark32_1024      5000000       449.0 ns/op      2276.88 MB/s
+Benchmark32_2048      2000000       894.0 ns/op      2289.87 MB/s
+Benchmark32_4096      1000000      1792.0 ns/op      2284.64 MB/s
+Benchmark32_8192       500000      3559.0 ns/op      2301.33 MB/s
 
 Benchmark128_1       50000000        33.2 ns/op        30.15 MB/s
 Benchmark128_2       50000000        33.3 ns/op        59.99 MB/s
