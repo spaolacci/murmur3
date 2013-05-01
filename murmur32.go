@@ -107,7 +107,10 @@ func Sum32(data []byte) uint32 {
 	var h1 uint32 = 1
 
 	nblocks := len(data) / 4
-	p := uintptr(unsafe.Pointer(&data[0]))
+	var p uintptr
+	if len(data) > 0 {
+		p = uintptr(unsafe.Pointer(&data[0]))
+	}
 	p1 := p + uintptr(4*nblocks)
 	for ; p < p1; p += 4 {
 		k1 := *(*uint32)(unsafe.Pointer(p))
