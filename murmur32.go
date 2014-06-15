@@ -33,7 +33,7 @@ func New32() hash.Hash32 {
 
 func (d *digest32) Size() int { return 4 }
 
-func (d *digest32) reset() { d.h1 = 1 }
+func (d *digest32) reset() { d.h1 = 0 }
 
 func (d *digest32) Sum(b []byte) []byte {
 	h := d.h1
@@ -104,7 +104,7 @@ func rotl32(x uint32, r byte) uint32 {
 //     return hasher.Sum32()
 func Sum32(data []byte) uint32 {
 
-	var h1 uint32 = 1
+	var h1 uint32 = 0
 
 	nblocks := len(data) / 4
 	var p uintptr

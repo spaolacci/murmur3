@@ -11,11 +11,11 @@ var data = []struct {
 	h64_2 uint64
 	s     string
 }{
-	{0x514e28b7, 0x4610abe56eff5cb5, 0x51622daa78f83583, ""},
-	{0xbb4abcad, 0xa78ddff5adae8d10, 0x128900ef20900135, "hello"},
-	{0x6f5cb2e9, 0x8b95f808840725c6, 0x1597ed5422bd493b, "hello, world"},
-	{0xf50e1f30, 0x2a929de9c8f97b2f, 0x56a41d99af43a2db, "19 Jan 2038 at 3:14:07 AM"},
-	{0x846f6a36, 0xfb3325171f9744da, 0xaaf8b92a5f722952, "The quick brown fox jumps over the lazy dog."},
+	{0x00000000, 0x0000000000000000, 0x0000000000000000, ""},
+	{0x248bfa47, 0xcbd8a7b341bd9b02, 0x5b1e906a48ae1d19, "hello"},
+	{0x149bbb7f, 0x342fac623a5ebc8e, 0x4cdcbc079642414d, "hello, world"},
+	{0xe31e8a70, 0xb89e5988b737affc, 0x664fc2950231b2cb, "19 Jan 2038 at 3:14:07 AM"},
+	{0xd5c48bfc, 0xcd99481f9ee902c9, 0x695da1a38987b6e7, "The quick brown fox jumps over the lazy dog."},
 }
 
 func TestRef(t *testing.T) {

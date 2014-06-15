@@ -40,7 +40,7 @@ func New128() Hash128 {
 
 func (d *digest128) Size() int { return 16 }
 
-func (d *digest128) reset() { d.h1, d.h2 = 1, 1 }
+func (d *digest128) reset() { d.h1, d.h2 = 0, 0 }
 
 func (d *digest128) Sum(b []byte) []byte {
 	h1, h2 := d.h1, d.h2
@@ -182,7 +182,7 @@ func rotl64(x uint64, r byte) uint64 {
 //     hasher.Write(data)
 //     return hasher.Sum128()
 func Sum128(data []byte) (h1 uint64, h2 uint64) {
-	d := &digest128{h1: 1, h2: 1}
+	d := &digest128{h1: 0, h2: 0}
 	d.tail = d.bmix(data)
 	d.clen = len(data)
 	return d.Sum128()
