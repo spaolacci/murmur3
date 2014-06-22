@@ -37,6 +37,10 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
 		}
 
+		if v := Sum64([]byte(elem.s)); v != elem.h64_1 {
+			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
+		}
+
 		var h128 Hash128 = New128()
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {

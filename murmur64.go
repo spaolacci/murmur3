@@ -37,7 +37,7 @@ func (d *digest64) Sum64() uint64 {
 //     hasher.Write(data)
 //     return hasher.Sum64()
 func Sum64(data []byte) uint64 {
-	d := &digest128{h1: 1, h2: 1}
+	d := &digest128{h1: 0, h2: 0}
 	d.tail = d.bmix(data)
 	d.clen = len(data)
 	h1, _ := d.Sum128()
