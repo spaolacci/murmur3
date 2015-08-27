@@ -43,7 +43,7 @@ func (d *digest128) Size() int { return 16 }
 func (d *digest128) reset() { d.h1, d.h2 = 0, 0 }
 
 func (d *digest128) Sum(b []byte) []byte {
-	h1, h2 := d.h1, d.h2
+	h1, h2 := d.Sum128()
 	return append(b,
 		byte(h1>>56), byte(h1>>48), byte(h1>>40), byte(h1>>32),
 		byte(h1>>24), byte(h1>>16), byte(h1>>8), byte(h1),

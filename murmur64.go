@@ -20,7 +20,7 @@ func New64() hash.Hash64 {
 }
 
 func (d *digest64) Sum(b []byte) []byte {
-	h1 := d.h1
+	h1 := d.Sum64()
 	return append(b,
 		byte(h1>>56), byte(h1>>48), byte(h1>>40), byte(h1>>32),
 		byte(h1>>24), byte(h1>>16), byte(h1>>8), byte(h1))
