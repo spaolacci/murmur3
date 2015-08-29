@@ -36,7 +36,7 @@ func (d *digest32) Size() int { return 4 }
 func (d *digest32) reset() { d.h1 = 0 }
 
 func (d *digest32) Sum(b []byte) []byte {
-	h := d.h1
+	h := d.Sum32()
 	return append(b, byte(h>>24), byte(h>>16), byte(h>>8), byte(h))
 }
 

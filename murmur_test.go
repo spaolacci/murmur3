@@ -1,6 +1,7 @@
 package murmur3
 
 import (
+	"fmt"
 	"hash"
 	"testing"
 )
@@ -27,6 +28,13 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
 		}
 
+		var h32_byte hash.Hash32 = New32()
+		h32_byte.Write([]byte(elem.s))
+		target := fmt.Sprintf("%08x", elem.h32)
+		if p := fmt.Sprintf("%x", h32_byte.Sum(nil)); p != target {
+			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
+		}
+
 		if v := Sum32([]byte(elem.s)); v != elem.h32 {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
 		}
@@ -37,6 +45,13 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
 		}
 
+		var h64_byte hash.Hash64 = New64()
+		h64_byte.Write([]byte(elem.s))
+		target = fmt.Sprintf("%016x", elem.h64_1)
+		if p := fmt.Sprintf("%x", h64_byte.Sum(nil)); p != target {
+			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
+		}
+
 		if v := Sum64([]byte(elem.s)); v != elem.h64_1 {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
 		}
@@ -45,6 +60,13 @@ func TestRef(t *testing.T) {
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
 			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+		}
+
+		var h128_byte Hash128 = New128()
+		h128_byte.Write([]byte(elem.s))
+		target = fmt.Sprintf("%016x%016x", elem.h64_1, elem.h64_2)
+		if p := fmt.Sprintf("%x", h128_byte.Sum(nil)); p != target {
+			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
 		}
 
 		if v1, v2 := Sum128([]byte(elem.s)); v1 != elem.h64_1 || v2 != elem.h64_2 {
