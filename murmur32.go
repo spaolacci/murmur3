@@ -108,7 +108,7 @@ func rotl32(x uint32, r byte) uint32 {
 //     hasher.Write(data)
 //     return hasher.Sum32()
 func Sum32(data []byte) uint32 {
-	return SumSeed32(0, data)
+	return SeededSum32(0, data)
 }
 
 // SeededSum32 returns the MurmurHash3 sum of data, seeded with the provided
