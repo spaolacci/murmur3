@@ -25,9 +25,14 @@ type digest32 struct {
 }
 
 func New32() hash.Hash32 {
+	return NewSeeded32(0)
+}
+
+func NewSeeded32(seed uint32) hash.Hash32 {
 	d := new(digest32)
 	d.bmixer = d
 	d.Reset()
+	d.h1 = seed
 	return d
 }
 
@@ -103,8 +108,13 @@ func rotl32(x uint32, r byte) uint32 {
 //     hasher.Write(data)
 //     return hasher.Sum32()
 func Sum32(data []byte) uint32 {
+	return SumSeed32(0, data)
+}
 
-	var h1 uint32 = 0
+// SeededSum32 returns the MurmurHash3 sum of data, seeded with the provided
+// value. A seed of 0 is equvalent to using Sum32().
+func SeededSum32(seed uint32, data []byte) uint32 {
+	h1 := seed
 
 	nblocks := len(data) / 4
 	var p uintptr

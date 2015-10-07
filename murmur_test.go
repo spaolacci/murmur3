@@ -1,6 +1,7 @@
 package murmur3
 
 import (
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"testing"
@@ -95,6 +96,34 @@ func TestIncremental(t *testing.T) {
 		}
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
 			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+		}
+	}
+}
+
+// TestSeeding32 tests seeded 32-bit hashing. The test data is from:
+// https://bitcoin.org/en/developer-examples#creating-a-bloom-filter
+func TestSeeding32(t *testing.T) {
+	data, _ := hex.DecodeString("019f5b01d4195ecbc9398fbf3c3b1fa9" +
+		"bb3183301d7a1fb3bd174fcfa40a2b65")
+	res := []uint32{7, 9, 10, 2, 11, 5, 0, 8, 5, 8, 4}
+
+	for i, _ := range res {
+		seed := (uint32(i) * 0xfba4c795) & 0xffffffff
+		hash := SeededSum32(seed, data) % 16
+		if hash != res[i] {
+			t.Errorf("SumSeed32: Mismatch in round %d: expected %d, got %d",
+				i, res[i], hash)
+		}
+	}
+
+	for i, _ := range res {
+		seed := (uint32(i) * 0xfba4c795) & 0xffffffff
+		hasher := NewSeeded32(seed)
+		hasher.Write(data)
+		hash := hasher.Sum32() % 16
+		if hash != res[i] {
+			t.Errorf("NewSeeded32: Mismatch in round %d: expected %d, got %d",
+				i, res[i], hash)
 		}
 	}
 }
