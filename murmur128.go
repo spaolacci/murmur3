@@ -187,3 +187,10 @@ func Sum128(data []byte) (h1 uint64, h2 uint64) {
 	d.clen = len(data)
 	return d.Sum128()
 }
+
+func Sum128WithSeed(data []byte, seed uint64) (h1 uint64, h2 uint64) {
+	d := &digest128{h1: seed, h2: seed}
+	d.tail = d.bmix(data)
+	d.clen = len(data)
+	return d.Sum128()
+}
