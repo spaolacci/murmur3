@@ -14,8 +14,8 @@ var (
 // digest64 is half a digest128.
 type digest64 digest128
 
-func New64() hash.Hash64 {
-	d := (*digest64)(New128().(*digest128))
+func New64(seed uint64) hash.Hash64 {
+	d := (*digest64)(New128(seed, 0).(*digest128))
 	return d
 }
 

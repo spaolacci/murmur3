@@ -22,13 +22,13 @@ var data = []struct {
 func TestRef(t *testing.T) {
 	for _, elem := range data {
 
-		var h32 hash.Hash32 = New32()
+		var h32 hash.Hash32 = New32(0)
 		h32.Write([]byte(elem.s))
 		if v := h32.Sum32(); v != elem.h32 {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
 		}
 
-		var h32_byte hash.Hash32 = New32()
+		var h32_byte hash.Hash32 = New32(0)
 		h32_byte.Write([]byte(elem.s))
 		target := fmt.Sprintf("%08x", elem.h32)
 		if p := fmt.Sprintf("%x", h32_byte.Sum(nil)); p != target {
@@ -39,13 +39,13 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
 		}
 
-		var h64 hash.Hash64 = New64()
+		var h64 hash.Hash64 = New64(0)
 		h64.Write([]byte(elem.s))
 		if v := h64.Sum64(); v != elem.h64_1 {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
 		}
 
-		var h64_byte hash.Hash64 = New64()
+		var h64_byte hash.Hash64 = New64(0)
 		h64_byte.Write([]byte(elem.s))
 		target = fmt.Sprintf("%016x", elem.h64_1)
 		if p := fmt.Sprintf("%x", h64_byte.Sum(nil)); p != target {
@@ -56,13 +56,13 @@ func TestRef(t *testing.T) {
 			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
 		}
 
-		var h128 Hash128 = New128()
+		var h128 Hash128 = New128(0, 0)
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
 			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
 		}
 
-		var h128_byte Hash128 = New128()
+		var h128_byte Hash128 = New128(0, 0)
 		h128_byte.Write([]byte(elem.s))
 		target = fmt.Sprintf("%016x%016x", elem.h64_1, elem.h64_2)
 		if p := fmt.Sprintf("%x", h128_byte.Sum(nil)); p != target {
@@ -77,8 +77,8 @@ func TestRef(t *testing.T) {
 
 func TestIncremental(t *testing.T) {
 	for _, elem := range data {
-		h32 := New32()
-		h128 := New128()
+		h32 := New32(0)
+		h128 := New128(0, 0)
 		for i, j, k := 0, 0, len(elem.s); i < k; i = j {
 			j = 2*i + 3
 			if j > k {
@@ -166,7 +166,7 @@ func benchPartial32(b *testing.B, length int) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		hasher := New32()
+		hasher := New32(0)
 		hasher.Write(buf[0:start])
 
 		for j := start; j+k <= length; j += k {
