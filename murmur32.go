@@ -24,11 +24,15 @@ type digest32 struct {
 	h1 uint32 // Unfinalized running hash.
 }
 
-func New32() hash.Hash32 {
-	d := new(digest32)
+func SeedNew32(seed uint32) hash.Hash32 {
+	d := &digest32{h1: seed}
 	d.bmixer = d
 	d.Reset()
 	return d
+}
+
+func New32() hash.Hash32 {
+	return SeedNew32(0)
 }
 
 func (d *digest32) Size() int { return 4 }
