@@ -90,3 +90,11 @@ TEXT ·Sum32(SB), $0-28
 	sum32
 	MOVL AX, h1+24(FP)
 	RET
+
+TEXT ·SeedSum32(SB), $0-36
+	MOVL seed+0(FP), AX
+	MOVQ data_base+8(FP), SI
+	MOVQ data_len+16(FP), CX
+	sum32
+	MOVL AX, h1+32(FP)
+	RET

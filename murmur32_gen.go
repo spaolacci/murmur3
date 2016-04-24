@@ -10,7 +10,13 @@ import "unsafe"
 //     hasher.Write(data)
 //     return hasher.Sum32()
 func Sum32(data []byte) uint32 {
-	h1 := 0
+	return SeedSum32(0, data)
+}
+
+// SeedSum32 returns the MurmurHash3 sum of data with the digest initialized to
+// seed.
+func SeedSum32(seed uint32, data []byte) (h1 uint32) {
+	h1 = seed
 	nblocks := len(data) / 4
 	for i := 0; i < nblocks; i++ {
 		k1 := *(*uint32)(unsafe.Pointer(&data[i*4]))
