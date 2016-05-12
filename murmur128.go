@@ -1,7 +1,6 @@
 package murmur3
 
 import (
-	//"encoding/binary"
 	"hash"
 	"unsafe"
 )
@@ -18,7 +17,7 @@ var (
 	_ bmixer    = new(digest128)
 )
 
-// Hack: the standard api doesn't define any Hash128 interface.
+// Hash128 provides an interface for a streaming 128 bit hash.
 type Hash128 interface {
 	hash.Hash
 	Sum128() (uint64, uint64)
@@ -31,11 +30,18 @@ type digest128 struct {
 	h2 uint64 // Unfinalized running hash part 2.
 }
 
-func New128() Hash128 {
-	d := new(digest128)
+// SeedNew128 returns a Hash128 for streaming 128 bit sums with its internal
+// digests initialized to seed1 and seed2.
+func SeedNew128(seed1, seed2 uint64) Hash128 {
+	d := &digest128{h1: seed1, h2: seed2}
 	d.bmixer = d
 	d.Reset()
 	return d
+}
+
+// New128 returns a Hash128 for streaming 128 bit sums.
+func New128() Hash128 {
+	return SeedNew128(0, 0)
 }
 
 func (d *digest128) Size() int { return 16 }
@@ -168,22 +174,4 @@ func fmix64(k uint64) uint64 {
 	k *= 0xc4ceb9fe1a85ec53
 	k ^= k >> 33
 	return k
-}
-
-/*
-func rotl64(x uint64, r byte) uint64 {
-	return (x << r) | (x >> (64 - r))
-}
-*/
-
-// Sum128 returns the MurmurHash3 sum of data. It is equivalent to the
-// following sequence (without the extra burden and the extra allocation):
-//     hasher := New128()
-//     hasher.Write(data)
-//     return hasher.Sum128()
-func Sum128(data []byte) (h1 uint64, h2 uint64) {
-	d := &digest128{h1: 0, h2: 0}
-	d.tail = d.bmix(data)
-	d.clen = len(data)
-	return d.Sum128()
 }

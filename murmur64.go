@@ -14,9 +14,15 @@ var (
 // digest64 is half a digest128.
 type digest64 digest128
 
+// SeedNew64 returns a hash.Hash64 for streaming 64 bit sums with its internal
+// digest initialized to seed.
+func SeedNew64(seed uint64) hash.Hash64 {
+	return (*digest64)(SeedNew128(seed, 0).(*digest128))
+}
+
+// New64 returns a hash.Hash64 for streaming 64 bit sums.
 func New64() hash.Hash64 {
-	d := (*digest64)(New128().(*digest128))
-	return d
+	return SeedNew64(0)
 }
 
 func (d *digest64) Sum(b []byte) []byte {
@@ -37,9 +43,13 @@ func (d *digest64) Sum64() uint64 {
 //     hasher.Write(data)
 //     return hasher.Sum64()
 func Sum64(data []byte) uint64 {
-	d := &digest128{h1: 0, h2: 0}
-	d.tail = d.bmix(data)
-	d.clen = len(data)
-	h1, _ := d.Sum128()
+	h1, _ := SeedSum128(0, 0, data)
+	return h1
+}
+
+// SeedSum64 returns the MurmurHash3 sum of data with the digest initialized to
+// seed.
+func SeedSum64(seed uint64, data []byte) uint64 {
+	h1, _ := SeedSum128(seed, 0, data)
 	return h1
 }
