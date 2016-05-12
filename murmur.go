@@ -2,18 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Native (and fast) implementation of Austin Appleby's MurmurHash3.
-
-Package murmur3 implements Austin Appleby's non-cryptographic MurmurHash3.
-
- Reference implementation:
-    http://code.google.com/p/smhasher/wiki/MurmurHash3
-
- History, characteristics and (legacy) perfs:
-    https://sites.google.com/site/murmurhash/
-    https://sites.google.com/site/murmurhash/statistics
-*/
+// package murmur3 provides a fast, native implementations of Austin Appleby's
+// non-cryptographic MurmurHash3 alrogithm.
+//
+// Assembly is provided for amd64 go1.5+; pull requests are welcome for other
+// architectures.
 package murmur3
 
 type bmixer interface {

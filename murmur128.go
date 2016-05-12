@@ -1,7 +1,6 @@
 package murmur3
 
 import (
-	//"encoding/binary"
 	"hash"
 	"unsafe"
 )
@@ -18,7 +17,7 @@ var (
 	_ bmixer    = new(digest128)
 )
 
-// Hack: the standard api doesn't define any Hash128 interface.
+// Hash128 provides an interface for a streaming 128 bit hash.
 type Hash128 interface {
 	hash.Hash
 	Sum128() (uint64, uint64)
@@ -31,6 +30,8 @@ type digest128 struct {
 	h2 uint64 // Unfinalized running hash part 2.
 }
 
+// SeedNew128 returns a Hash128 for streaming 128 bit sums with its internal
+// digests initialized to seed1 and seed2.
 func SeedNew128(seed1, seed2 uint64) Hash128 {
 	d := &digest128{h1: seed1, h2: seed2}
 	d.bmixer = d
@@ -38,6 +39,7 @@ func SeedNew128(seed1, seed2 uint64) Hash128 {
 	return d
 }
 
+// New128 returns a Hash128 for streaming 128 bit sums.
 func New128() Hash128 {
 	return SeedNew128(0, 0)
 }

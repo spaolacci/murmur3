@@ -1,7 +1,5 @@
 package murmur3
 
-// http://code.google.com/p/guava-libraries/source/browse/guava/src/com/google/common/hash/Murmur3_32HashFunction.java
-
 import (
 	"hash"
 	"unsafe"
@@ -24,6 +22,8 @@ type digest32 struct {
 	h1 uint32 // Unfinalized running hash.
 }
 
+// SeedNew32 returns a hash.Hash32 for streaming 32 bit sums with its internal
+// digest initialized to seed.
 func SeedNew32(seed uint32) hash.Hash32 {
 	d := &digest32{h1: seed}
 	d.bmixer = d
@@ -31,6 +31,7 @@ func SeedNew32(seed uint32) hash.Hash32 {
 	return d
 }
 
+// New32 returns a hash.Hash32 for streaming 32 bit sums.
 func New32() hash.Hash32 {
 	return SeedNew32(0)
 }

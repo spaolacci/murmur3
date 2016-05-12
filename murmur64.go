@@ -14,10 +14,13 @@ var (
 // digest64 is half a digest128.
 type digest64 digest128
 
+// SeedNew64 returns a hash.Hash64 for streaming 64 bit sums with its internal
+// digest initialized to seed.
 func SeedNew64(seed uint64) hash.Hash64 {
 	return (*digest64)(SeedNew128(seed, 0).(*digest128))
 }
 
+// New64 returns a hash.Hash64 for streaming 64 bit sums.
 func New64() hash.Hash64 {
 	return SeedNew64(0)
 }
