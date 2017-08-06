@@ -11,6 +11,7 @@ import (
 var (
 	_ hash.Hash   = new(digest32)
 	_ hash.Hash32 = new(digest32)
+	_ bmixer      = new(digest32)
 )
 
 const (
@@ -21,11 +22,14 @@ const (
 // digest32 represents a partial evaluation of a 32 bites hash.
 type digest32 struct {
 	digest
-	h1 uint32 // Unfinalized running hash.
+	seed uint32
+	h1   uint32 // Unfinalized running hash.
 }
 
-func New32() hash.Hash32 {
-	d := new(digest32)
+func New32() hash.Hash32 { return New32WithSeed(0) }
+
+func New32WithSeed(seed uint32) hash.Hash32 {
+	d := &digest32{seed: seed}
 	d.bmixer = d
 	d.Reset()
 	return d
@@ -33,7 +37,7 @@ func New32() hash.Hash32 {
 
 func (d *digest32) Size() int { return 4 }
 
-func (d *digest32) reset() { d.h1 = 0 }
+func (d *digest32) reset() { d.h1 = d.seed }
 
 func (d *digest32) Sum(b []byte) []byte {
 	h := d.Sum32()
@@ -102,9 +106,11 @@ func rotl32(x uint32, r byte) uint32 {
 //     hasher := New32()
 //     hasher.Write(data)
 //     return hasher.Sum32()
-func Sum32(data []byte) uint32 {
+func Sum32(data []byte) uint32 { return Sum32WithSeed(data, 0) }
 
-	var h1 uint32 = 0
+func Sum32WithSeed(data []byte, seed uint32) uint32 {
+
+	var h1 uint32 = seed
 
 	nblocks := len(data) / 4
 	var p uintptr

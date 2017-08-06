@@ -27,12 +27,15 @@ type Hash128 interface {
 // digest128 represents a partial evaluation of a 128 bites hash.
 type digest128 struct {
 	digest
-	h1 uint64 // Unfinalized running hash part 1.
-	h2 uint64 // Unfinalized running hash part 2.
+	seed uint64
+	h1   uint64 // Unfinalized running hash part 1.
+	h2   uint64 // Unfinalized running hash part 2.
 }
 
-func New128() Hash128 {
-	d := new(digest128)
+func New128() Hash128 { return New128WithSeed(0) }
+
+func New128WithSeed(seed uint32) Hash128 {
+	d := &digest128{seed: uint64(seed)}
 	d.bmixer = d
 	d.Reset()
 	return d
@@ -40,7 +43,7 @@ func New128() Hash128 {
 
 func (d *digest128) Size() int { return 16 }
 
-func (d *digest128) reset() { d.h1, d.h2 = 0, 0 }
+func (d *digest128) reset() { d.h1, d.h2 = d.seed, d.seed }
 
 func (d *digest128) Sum(b []byte) []byte {
 	h1, h2 := d.Sum128()
@@ -181,8 +184,10 @@ func rotl64(x uint64, r byte) uint64 {
 //     hasher := New128()
 //     hasher.Write(data)
 //     return hasher.Sum128()
-func Sum128(data []byte) (h1 uint64, h2 uint64) {
-	d := &digest128{h1: 0, h2: 0}
+func Sum128(data []byte) (h1 uint64, h2 uint64) { return Sum128WithSeed(data, 0) }
+
+func Sum128WithSeed(data []byte, seed uint32) (h1 uint64, h2 uint64) {
+	d := &digest128{h1: uint64(seed), h2: uint64(seed)}
 	d.tail = d.bmix(data)
 	d.clen = len(data)
 	return d.Sum128()
