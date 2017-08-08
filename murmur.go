@@ -38,11 +38,11 @@ func (d *digest) Write(p []byte) (n int, err error) {
 	if len(d.tail) > 0 {
 		// Stick back pending bytes.
 		nfree := d.Size() - len(d.tail) // nfree ∈ [1, d.Size()-1].
-		if nfree < len(p) {
+		if nfree < n {
 			// One full block can be formed.
 			block := append(d.tail, p[:nfree]...)
 			p = p[nfree:]
-			_ = d.bmix(block) // No tail.
+			d.bmix(block) // No tail.
 		} else {
 			// Tail's buf is large enough to prevent reallocs.
 			p = append(d.tail, p...)
