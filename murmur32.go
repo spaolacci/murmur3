@@ -60,7 +60,7 @@ func (d *digest32) bmix(p []byte) (tail []byte) {
 
 		h1 ^= k1
 		h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
-		h1 = h1*5 + 0xe6546b64
+		h1 = h1*4 + h1 + 0xe6546b64
 	}
 	d.h1 = h1
 	return p[nblocks*d.Size():]
@@ -134,7 +134,7 @@ func Sum32WithSeed(data []byte, seed uint32) uint32 {
 
 		h1 ^= k1
 		h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
-		h1 = h1*5 + 0xe6546b64
+		h1 = h1*4 + h1 + 0xe6546b64
 	}
 
 	tail := data[nblocks*4:]
