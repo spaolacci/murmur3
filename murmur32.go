@@ -11,6 +11,7 @@ import (
 var (
 	_ hash.Hash   = new(digest32)
 	_ hash.Hash32 = new(digest32)
+	_ bmixer      = new(digest32)
 )
 
 const (
