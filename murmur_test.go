@@ -2,7 +2,6 @@ package murmur3
 
 import (
 	"fmt"
-	"hash"
 	"testing"
 )
 
@@ -35,55 +34,56 @@ var data = []struct {
 func TestRefStrings(t *testing.T) {
 	for _, elem := range data {
 
-		var h32 hash.Hash32 = New32WithSeed(elem.seed)
+		h32 := New32WithSeed(elem.seed)
 		h32.Write([]byte(elem.s))
 		if v := h32.Sum32(); v != elem.h32 {
-			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
+			t.Errorf("[Hash32] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h32)
 		}
 
 		h32.Reset()
 		h32.Write([]byte(elem.s))
 		target := fmt.Sprintf("%08x", elem.h32)
 		if p := fmt.Sprintf("%x", h32.Sum(nil)); p != target {
-			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
+			t.Errorf("[Hash32] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
 		if v := Sum32WithSeed([]byte(elem.s), elem.seed); v != elem.h32 {
-			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
+			t.Errorf("[Hash32] key '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h32)
 		}
 
-		var h64 hash.Hash64 = New64WithSeed(elem.seed)
+		h64 := New64WithSeed(elem.seed)
 		h64.Write([]byte(elem.s))
 		if v := h64.Sum64(); v != elem.h64_1 {
-			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
+			t.Errorf("'[Hash64] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h64_1)
 		}
 
 		h64.Reset()
 		h64.Write([]byte(elem.s))
 		target = fmt.Sprintf("%016x", elem.h64_1)
 		if p := fmt.Sprintf("%x", h64.Sum(nil)); p != target {
-			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
+			t.Errorf("[Hash64] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
 		if v := Sum64WithSeed([]byte(elem.s), elem.seed); v != elem.h64_1 {
-			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h64_1)
+			t.Errorf("[Hash64] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h64_1)
 		}
 
-		var h128 Hash128 = New128WithSeed(elem.seed)
+		h128 := New128WithSeed(elem.seed)
+
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
-			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+			t.Errorf("[Hash128] key: '%s', seed: '%d': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, elem.seed, v1, v2, elem.h64_1, elem.h64_2)
 		}
 
 		h128.Reset()
 		h128.Write([]byte(elem.s))
 		target = fmt.Sprintf("%016x%016x", elem.h64_1, elem.h64_2)
 		if p := fmt.Sprintf("%x", h128.Sum(nil)); p != target {
-			t.Errorf("'%s': %s (want %s)", elem.s, p, target)
+			t.Errorf("[Hash128] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
 		if v1, v2 := Sum128WithSeed([]byte(elem.s), elem.seed); v1 != elem.h64_1 || v2 != elem.h64_2 {
-			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+			t.Errorf("[Hash128] key: '%s', seed: '%d': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, elem.seed, v1, v2, elem.h64_1, elem.h64_2)
 		}
 	}
 }
@@ -92,7 +92,8 @@ func TestIncremental(t *testing.T) {
 	for _, elem := range data {
 		h32 := New32WithSeed(elem.seed)
 		h128 := New128WithSeed(elem.seed)
-		for i, j, k := 0, 0, len(elem.s); i < k; i = j {
+		var i, j int
+		for k := len(elem.s); i < k; i = j {
 			j = 2*i + 3
 			if j > k {
 				j = k
@@ -104,10 +105,10 @@ func TestIncremental(t *testing.T) {
 		}
 		println()
 		if v := h32.Sum32(); v != elem.h32 {
-			t.Errorf("'%s': 0x%x (want 0x%x)", elem.s, v, elem.h32)
+			t.Errorf("[Hash32] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h32)
 		}
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
-			t.Errorf("'%s': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, v1, v2, elem.h64_1, elem.h64_2)
+			t.Errorf("[Hash128] key: '%s', seed: '%d': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, elem.seed, v1, v2, elem.h64_1, elem.h64_2)
 		}
 	}
 }
