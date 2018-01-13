@@ -115,9 +115,10 @@ func TestIncremental(t *testing.T) {
 }
 
 func Benchmark32(b *testing.B) {
-	for length := 1; length <= 8192; length *= 2 {
+	buf := make([]byte, 8192)
+	for length := 1; length <= cap(buf); length *= 2 {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf := make([]byte, length)
+			buf = buf[:length]
 			b.SetBytes(int64(length))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
@@ -128,9 +129,10 @@ func Benchmark32(b *testing.B) {
 }
 
 func BenchmarkPartial32(b *testing.B) {
-	for length := 8; length <= 128; length *= 2 {
+	buf := make([]byte, 128)
+	for length := 8; length <= cap(buf); length *= 2 {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf := make([]byte, length)
+			buf = buf[:length]
 			b.SetBytes(int64(length))
 
 			start := (32 / 8) / 2
@@ -155,9 +157,10 @@ func BenchmarkPartial32(b *testing.B) {
 }
 
 func Benchmark64(b *testing.B) {
-	for length := 1; length <= 8192; length *= 2 {
+	buf := make([]byte, 8192)
+	for length := 1; length <= cap(buf); length *= 2 {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf := make([]byte, length)
+			buf = buf[:length]
 			b.SetBytes(int64(length))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
@@ -168,9 +171,10 @@ func Benchmark64(b *testing.B) {
 }
 
 func Benchmark128(b *testing.B) {
-	for length := 1; length <= 8192; length *= 2 {
+	buf := make([]byte, 8192)
+	for length := 1; length <= cap(buf); length *= 2 {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf := make([]byte, length)
+			buf = buf[:length]
 			b.SetBytes(int64(length))
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
