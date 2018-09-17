@@ -120,6 +120,7 @@ func Benchmark32(b *testing.B) {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
 			buf = buf[:length]
 			b.SetBytes(int64(length))
+			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				Sum32(buf)
@@ -134,6 +135,7 @@ func BenchmarkPartial32(b *testing.B) {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
 			buf = buf[:length]
 			b.SetBytes(int64(length))
+			b.ReportAllocs()
 
 			start := (32 / 8) / 2
 			chunks := 7
@@ -162,6 +164,7 @@ func Benchmark64(b *testing.B) {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
 			buf = buf[:length]
 			b.SetBytes(int64(length))
+			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				Sum64(buf)
@@ -176,6 +179,7 @@ func Benchmark128(b *testing.B) {
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
 			buf = buf[:length]
 			b.SetBytes(int64(length))
+			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				Sum128(buf)
