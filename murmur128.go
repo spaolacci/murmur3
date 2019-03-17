@@ -190,7 +190,7 @@ func Sum128(data []byte) (h1 uint64, h2 uint64) { return Sum128WithSeed(data, 0)
 //     hasher.Write(data)
 //     return hasher.Sum128()
 func Sum128WithSeed(data []byte, seed uint32) (h1 uint64, h2 uint64) {
-	d := &digest128{h1: uint64(seed), h2: uint64(seed)}
+	d := digest128{h1: uint64(seed), h2: uint64(seed)}
 	d.seed = seed
 	d.tail = d.bmix(data)
 	d.clen = len(data)
