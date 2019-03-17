@@ -3,8 +3,8 @@ package murmur3
 import (
 	//"encoding/binary"
 	"hash"
-	"unsafe"
 	"math/bits"
+	"unsafe"
 )
 
 const (
@@ -176,12 +176,6 @@ func fmix64(k uint64) uint64 {
 	k ^= k >> 33
 	return k
 }
-
-/*
-func rotl64(x uint64, r byte) uint64 {
-	return (x << r) | (x >> (64 - r))
-}
-*/
 
 // Sum128 returns the MurmurHash3 sum of data. It is equivalent to the
 // following sequence (without the extra burden and the extra allocation):
