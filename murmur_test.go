@@ -1,9 +1,11 @@
-package murmur3
+package murmur3_test
 
 import (
 	"fmt"
 	"strconv"
 	"testing"
+
+	"github.com/spaolacci/murmur3"
 )
 
 var data = []struct {
@@ -35,7 +37,7 @@ var data = []struct {
 func TestRefStrings(t *testing.T) {
 	for _, elem := range data {
 
-		h32 := New32WithSeed(elem.seed)
+		h32 := murmur3.New32WithSeed(elem.seed)
 		h32.Write([]byte(elem.s))
 		if v := h32.Sum32(); v != elem.h32 {
 			t.Errorf("[Hash32] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h32)
@@ -48,11 +50,11 @@ func TestRefStrings(t *testing.T) {
 			t.Errorf("[Hash32] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
-		if v := Sum32WithSeed([]byte(elem.s), elem.seed); v != elem.h32 {
+		if v := murmur3.Sum32WithSeed([]byte(elem.s), elem.seed); v != elem.h32 {
 			t.Errorf("[Hash32] key '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h32)
 		}
 
-		h64 := New64WithSeed(elem.seed)
+		h64 := murmur3.New64WithSeed(elem.seed)
 		h64.Write([]byte(elem.s))
 		if v := h64.Sum64(); v != elem.h64_1 {
 			t.Errorf("'[Hash64] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h64_1)
@@ -65,11 +67,11 @@ func TestRefStrings(t *testing.T) {
 			t.Errorf("[Hash64] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
-		if v := Sum64WithSeed([]byte(elem.s), elem.seed); v != elem.h64_1 {
+		if v := murmur3.Sum64WithSeed([]byte(elem.s), elem.seed); v != elem.h64_1 {
 			t.Errorf("[Hash64] key: '%s', seed: '%d': 0x%x (want 0x%x)", elem.s, elem.seed, v, elem.h64_1)
 		}
 
-		h128 := New128WithSeed(elem.seed)
+		h128 := murmur3.New128WithSeed(elem.seed)
 
 		h128.Write([]byte(elem.s))
 		if v1, v2 := h128.Sum128(); v1 != elem.h64_1 || v2 != elem.h64_2 {
@@ -83,7 +85,7 @@ func TestRefStrings(t *testing.T) {
 			t.Errorf("[Hash128] key: '%s', seed: '%d': %s (want %s)", elem.s, elem.seed, p, target)
 		}
 
-		if v1, v2 := Sum128WithSeed([]byte(elem.s), elem.seed); v1 != elem.h64_1 || v2 != elem.h64_2 {
+		if v1, v2 := murmur3.Sum128WithSeed([]byte(elem.s), elem.seed); v1 != elem.h64_1 || v2 != elem.h64_2 {
 			t.Errorf("[Hash128] key: '%s', seed: '%d': 0x%x-0x%x (want 0x%x-0x%x)", elem.s, elem.seed, v1, v2, elem.h64_1, elem.h64_2)
 		}
 	}
@@ -91,8 +93,8 @@ func TestRefStrings(t *testing.T) {
 
 func TestIncremental(t *testing.T) {
 	for _, elem := range data {
-		h32 := New32WithSeed(elem.seed)
-		h128 := New128WithSeed(elem.seed)
+		h32 := murmur3.New32WithSeed(elem.seed)
+		h128 := murmur3.New128WithSeed(elem.seed)
 		var i, j int
 		for k := len(elem.s); i < k; i = j {
 			j = 2*i + 3
@@ -114,17 +116,25 @@ func TestIncremental(t *testing.T) {
 	}
 }
 
+var sum uint64
+
 func Benchmark32(b *testing.B) {
 	buf := make([]byte, 8192)
+	var r uint64
 	for length := 1; length <= cap(buf); length *= 2 {
+		d := length / 4
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf = buf[:length]
-			b.SetBytes(int64(length))
 			b.ReportAllocs()
 			b.ResetTimer()
+			total := 0
 			for i := 0; i < b.N; i++ {
-				Sum32(buf)
+				l := length - rnd(&r, d)
+				bufn := buf[:l]
+				total += l
+				h1 := murmur3.Sum32(bufn)
+				sum += uint64(h1)
 			}
+			b.SetBytes(int64(total / b.N))
 		})
 	}
 }
@@ -144,7 +154,7 @@ func BenchmarkPartial32(b *testing.B) {
 
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				hasher := New32()
+				hasher := murmur3.New32()
 				hasher.Write(buf[0:start])
 
 				for j := start; j+k <= length; j += k {
@@ -160,30 +170,48 @@ func BenchmarkPartial32(b *testing.B) {
 
 func Benchmark64(b *testing.B) {
 	buf := make([]byte, 8192)
+	var r uint64
 	for length := 1; length <= cap(buf); length *= 2 {
+		d := length / 4
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf = buf[:length]
-			b.SetBytes(int64(length))
 			b.ReportAllocs()
 			b.ResetTimer()
+			total := 0
 			for i := 0; i < b.N; i++ {
-				Sum64(buf)
+				l := length - rnd(&r, d)
+				bufn := buf[:l]
+				total += l
+				sum += murmur3.Sum64(bufn)
 			}
+			b.SetBytes(int64(total / b.N))
 		})
 	}
 }
 
 func Benchmark128(b *testing.B) {
 	buf := make([]byte, 8192)
+	var r uint64
 	for length := 1; length <= cap(buf); length *= 2 {
+		d := length / 4
 		b.Run(strconv.Itoa(length), func(b *testing.B) {
-			buf = buf[:length]
-			b.SetBytes(int64(length))
 			b.ReportAllocs()
 			b.ResetTimer()
+			total := 0
 			for i := 0; i < b.N; i++ {
-				Sum128(buf)
+				l := length - rnd(&r, d)
+				bufn := buf[:l]
+				total += l
+				h1, _ := murmur3.Sum128(bufn)
+				sum += h1
 			}
+			b.SetBytes(int64(total / b.N))
 		})
 	}
+}
+
+func rnd(n *uint64, max int) int {
+	x := *n*5 + 0x23456789
+	*n = x
+	k := (x >> 32) * uint64(max)
+	return int(k >> 32)
 }
