@@ -18,6 +18,9 @@ var (
 const (
 	c1_32 uint32 = 0xcc9e2d51
 	c2_32 uint32 = 0x1b873593
+	c3_32 uint32 = 0x85ebca6b
+	c4_32 uint32 = 0xc2b2ae35
+	c5_32 uint32 = 0xe6546b64
 )
 
 // digest32 represents a partial evaluation of a 32 bites hash.
@@ -114,49 +117,39 @@ func Sum32WithSeed(data []byte, seed uint32) uint32 {
 
 	h1 := seed
 
-	nblocks := len(data) / 4
-	var p uintptr
-	if len(data) > 0 {
-		p = uintptr(unsafe.Pointer(&data[0]))
-	}
-	p1 := p + uintptr(4*nblocks)
-	for ; p < p1; p += 4 {
-		k1 := *(*uint32)(unsafe.Pointer(p))
+	dlen := len(data)
+	var k uint32
 
-		k1 *= c1_32
-		k1 = bits.RotateLeft32(k1, 15)
-		k1 *= c2_32
-
-		h1 ^= k1
-		h1 = bits.RotateLeft32(h1, 13)
-		h1 = h1*4 + h1 + 0xe6546b64
+	for i := dlen >> 2; i != 0; i-- {
+		k = uint32(data[0])<<24 | uint32(data[1])<<16 | uint32(data[2])<<8 | uint32(data[3])
+		data = data[4:]
+		h1 ^= mix(k)
+		h1 = (h1 << 13) | (h1 >> 19)
+		h1 = h1*5 + c5_32
 	}
 
-	tail := data[nblocks*4:]
-
-	var k1 uint32
-	switch len(tail) & 3 {
-	case 3:
-		k1 ^= uint32(tail[2]) << 16
-		fallthrough
-	case 2:
-		k1 ^= uint32(tail[1]) << 8
-		fallthrough
-	case 1:
-		k1 ^= uint32(tail[0])
-		k1 *= c1_32
-		k1 = bits.RotateLeft32(k1, 15)
-		k1 *= c2_32
-		h1 ^= k1
+	k = 0
+	for i := dlen & 3; i != 0; i-- {
+		k <<= 8
+		k |= uint32(data[i-1])
 	}
 
-	h1 ^= uint32(len(data))
+	h1 ^= mix(k)
 
+	h1 ^= uint32(dlen)
 	h1 ^= h1 >> 16
-	h1 *= 0x85ebca6b
+	h1 *= c3_32
 	h1 ^= h1 >> 13
-	h1 *= 0xc2b2ae35
+	h1 *= c4_32
 	h1 ^= h1 >> 16
 
 	return h1
+}
+
+func mix(k uint32) uint32 {
+	k *= c1_32
+	k = (k << 15) | (k >> 17)
+	k *= c2_32
+
+	return k
 }
