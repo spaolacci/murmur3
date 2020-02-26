@@ -53,7 +53,7 @@ func (d *digest32) bmix(p []byte) (tail []byte) {
 
 	nblocks := len(p) / 4
 	for i := 0; i < nblocks; i++ {
-		k1 := *(*uint32)(unsafe.Pointer(&p[i*4]))
+		k1 := *(*uint32)(unsafe.Pointer(uintptr(unsafe.Pointer(&p[i*4]))))
 
 		k1 *= c1_32
 		k1 = bits.RotateLeft32(k1, 15)
@@ -121,7 +121,7 @@ func Sum32WithSeed(data []byte, seed uint32) uint32 {
 	}
 	p1 := p + uintptr(4*nblocks)
 	for ; p < p1; p += 4 {
-		k1 := *(*uint32)(unsafe.Pointer(p))
+		k1 := *(*uint32)(unsafe.Pointer(uintptr(unsafe.Pointer(p))))
 
 		k1 *= c1_32
 		k1 = bits.RotateLeft32(k1, 15)

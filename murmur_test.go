@@ -187,3 +187,14 @@ func Benchmark128(b *testing.B) {
 		})
 	}
 }
+
+func TestUnalignedWrite(t *testing.T) {
+	// Causes "fatal error: checkptr: unsafe pointer conversion" for unsafe
+	// pointer conversions in Go 1.14+
+	b := make([]byte, 128)
+	for i := 0; i < 16; i++ {
+		Sum32(b[i:])
+		Sum64(b[i:])
+		Sum128(b[i:])
+	}
+}
