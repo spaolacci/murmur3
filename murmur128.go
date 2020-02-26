@@ -2,9 +2,9 @@ package murmur3
 
 import (
 	//"encoding/binary"
+	"encoding/binary"
 	"hash"
 	"math/bits"
-	"unsafe"
 )
 
 const (
@@ -65,8 +65,8 @@ func (d *digest128) bmix(p []byte) (tail []byte) {
 
 	nblocks := len(p) / 16
 	for i := 0; i < nblocks; i++ {
-		t := (*[2]uint64)(unsafe.Pointer(&p[i*16]))
-		k1, k2 := t[0], t[1]
+		k1 := binary.LittleEndian.Uint64(p[i*16:])
+		k2 := binary.LittleEndian.Uint64(p[i*16+8:])
 
 		k1 *= c1_128
 		k1 = bits.RotateLeft64(k1, 31)
