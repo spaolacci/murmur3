@@ -14,6 +14,11 @@ Package murmur3 implements Austin Appleby's non-cryptographic MurmurHash3.
 */
 package murmur3
 
+import (
+	"reflect"
+	"unsafe"
+)
+
 type bmixer interface {
 	bmix(p []byte) (tail []byte)
 	Size() (n int)
@@ -29,6 +34,24 @@ type digest struct {
 }
 
 func (d *digest) BlockSize() int { return 1 }
+
+func (d *digest) WriteString(s string) (int, error) {
+	// This code does the same as:
+	//
+	//   return d.Write([]byte(s))
+	//
+	// because the parameter `p` to Write is passed to d.bmix, which is an
+	// interface type, the simple conversion to a byte slice forces the compiler
+	// to make a heap allocation and copy the slice. The use of unsafe here lets
+	// us take over the default behavior of the compiler to have the byte slice
+	// share the underlying memory buffer of the string and avoid the extra heap
+	// allocation.
+	return d.Write(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+		Data: uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&s))),
+		Len:  len(s),
+		Cap:  len(s),
+	})))
+}
 
 func (d *digest) Write(p []byte) (n int, err error) {
 	n = len(p)
