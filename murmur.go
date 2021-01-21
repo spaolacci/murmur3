@@ -15,7 +15,6 @@ Package murmur3 implements Austin Appleby's non-cryptographic MurmurHash3.
 package murmur3
 
 import (
-	"reflect"
 	"unsafe"
 )
 
@@ -33,6 +32,13 @@ type digest struct {
 	bmixer
 }
 
+// sliceHeader is similar to reflect.SliceHeader, but it assumes that the layout
+// of the first two words is the same as the layout of a string.
+type sliceHeader struct {
+	s   string
+	cap int
+}
+
 func (d *digest) BlockSize() int { return 1 }
 
 func (d *digest) WriteString(s string) (int, error) {
@@ -46,11 +52,7 @@ func (d *digest) WriteString(s string) (int, error) {
 	// us take over the default behavior of the compiler to have the byte slice
 	// share the underlying memory buffer of the string and avoid the extra heap
 	// allocation.
-	return d.Write(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
-		Data: uintptr(*(*unsafe.Pointer)(unsafe.Pointer(&s))),
-		Len:  len(s),
-		Cap:  len(s),
-	})))
+	return d.Write(*(*[]byte)(unsafe.Pointer(&sliceHeader{s: s, cap: len(s)})))
 }
 
 func (d *digest) Write(p []byte) (n int, err error) {
