@@ -4,15 +4,16 @@ package murmur3
 
 import (
 	"hash"
+	"io"
 	"math/bits"
 	"unsafe"
 )
 
 // Make sure interfaces are correctly implemented.
 var (
-	_ hash.Hash   = new(digest32)
-	_ hash.Hash32 = new(digest32)
-	_ bmixer      = new(digest32)
+	_ hash.Hash       = (*Digest32)(nil)
+	_ hash.Hash32     = (*Digest32)(nil)
+	_ io.StringWriter = (*Digest32)(nil)
 )
 
 const (
@@ -20,35 +21,45 @@ const (
 	c2_32 uint32 = 0x1b873593
 )
 
-// digest32 represents a partial evaluation of a 32 bites hash.
-type digest32 struct {
+// Digest32 represents a partial evaluation of a 32 bites hash.
+type Digest32 struct {
 	digest
 	h1 uint32 // Unfinalized running hash.
 }
 
 // New32 returns new 32-bit hasher
-func New32() hash.Hash32 { return New32WithSeed(0) }
+func New32() *Digest32 { return New32WithSeed(0) }
 
 // New32WithSeed returns new 32-bit hasher set with explicit seed value
-func New32WithSeed(seed uint32) hash.Hash32 {
-	d := new(digest32)
-	d.seed = seed
-	d.bmixer = d
-	d.Reset()
-	return d
+func New32WithSeed(seed uint32) *Digest32 {
+	return &Digest32{
+		digest: digest{seed: seed},
+		h1:     seed,
+	}
 }
 
-func (d *digest32) Size() int { return 4 }
+func (d *Digest32) Reset() {
+	d.reset()
+	d.h1 = d.seed
+}
 
-func (d *digest32) reset() { d.h1 = d.seed }
+func (d *Digest32) Size() int { return 4 }
 
-func (d *digest32) Sum(b []byte) []byte {
+func (d *Digest32) WriteString(s string) (int, error) {
+	return d.Write(unsafeStringToBytes(s))
+}
+
+func (d *Digest32) Write(b []byte) (int, error) {
+	return d.write(b, d.Size(), d.bmix)
+}
+
+func (d *Digest32) Sum(b []byte) []byte {
 	h := d.Sum32()
 	return append(b, byte(h>>24), byte(h>>16), byte(h>>8), byte(h))
 }
 
-// Digest as many blocks as possible.
-func (d *digest32) bmix(p []byte) (tail []byte) {
+// digest as many blocks as possible.
+func (d *Digest32) bmix(p []byte) (tail []byte) {
 	h1 := d.h1
 
 	nblocks := len(p) / 4
@@ -67,7 +78,7 @@ func (d *digest32) bmix(p []byte) (tail []byte) {
 	return p[nblocks*d.Size():]
 }
 
-func (d *digest32) Sum32() (h1 uint32) {
+func (d *Digest32) Sum32() (h1 uint32) {
 
 	h1 = d.h1
 

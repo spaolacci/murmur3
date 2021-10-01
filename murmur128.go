@@ -1,8 +1,9 @@
 package murmur3
 
 import (
-	//"encoding/binary"
+	// "encoding/binary"
 	"hash"
+	"io"
 	"math/bits"
 	"unsafe"
 )
@@ -14,9 +15,9 @@ const (
 
 // Make sure interfaces are correctly implemented.
 var (
-	_ hash.Hash = new(digest128)
-	_ Hash128   = new(digest128)
-	_ bmixer    = new(digest128)
+	_ hash.Hash       = (*Digest128)(nil)
+	_ Hash128         = (*Digest128)(nil)
+	_ io.StringWriter = (*Digest128)(nil)
 )
 
 // Hash128 represents a 128-bit hasher
@@ -26,30 +27,41 @@ type Hash128 interface {
 	Sum128() (uint64, uint64)
 }
 
-// digest128 represents a partial evaluation of a 128 bites hash.
-type digest128 struct {
+// Digest128 represents a partial evaluation of a 128 bites hash.
+type Digest128 struct {
 	digest
 	h1 uint64 // Unfinalized running hash part 1.
 	h2 uint64 // Unfinalized running hash part 2.
 }
 
 // New128 returns a 128-bit hasher
-func New128() Hash128 { return New128WithSeed(0) }
+func New128() *Digest128 { return New128WithSeed(0) }
 
 // New128WithSeed returns a 128-bit hasher set with explicit seed value
-func New128WithSeed(seed uint32) Hash128 {
-	d := new(digest128)
-	d.seed = seed
-	d.bmixer = d
-	d.Reset()
-	return d
+func New128WithSeed(seed uint32) *Digest128 {
+	return &Digest128{
+		digest: digest{seed: seed},
+		h1:     uint64(seed),
+		h2:     uint64(seed),
+	}
 }
 
-func (d *digest128) Size() int { return 16 }
+func (d *Digest128) Size() int { return 16 }
 
-func (d *digest128) reset() { d.h1, d.h2 = uint64(d.seed), uint64(d.seed) }
+func (d *Digest128) WriteString(s string) (int, error) {
+	return d.Write(unsafeStringToBytes(s))
+}
 
-func (d *digest128) Sum(b []byte) []byte {
+func (d *Digest128) Write(b []byte) (int, error) {
+	return d.write(b, d.Size(), d.bmix)
+}
+
+func (d *Digest128) Reset() {
+	d.reset()
+	d.h1, d.h2 = uint64(d.seed), uint64(d.seed)
+}
+
+func (d *Digest128) Sum(b []byte) []byte {
 	h1, h2 := d.Sum128()
 	return append(b,
 		byte(h1>>56), byte(h1>>48), byte(h1>>40), byte(h1>>32),
@@ -60,7 +72,7 @@ func (d *digest128) Sum(b []byte) []byte {
 	)
 }
 
-func (d *digest128) bmix(p []byte) (tail []byte) {
+func (d *Digest128) bmix(p []byte) (tail []byte) {
 	h1, h2 := d.h1, d.h2
 
 	nblocks := len(p) / 16
@@ -90,7 +102,7 @@ func (d *digest128) bmix(p []byte) (tail []byte) {
 	return p[nblocks*d.Size():]
 }
 
-func (d *digest128) Sum128() (h1, h2 uint64) {
+func (d *Digest128) Sum128() (h1, h2 uint64) {
 
 	h1, h2 = d.h1, d.h2
 
@@ -190,7 +202,7 @@ func Sum128(data []byte) (h1 uint64, h2 uint64) { return Sum128WithSeed(data, 0)
 //     hasher.Write(data)
 //     return hasher.Sum128()
 func Sum128WithSeed(data []byte, seed uint32) (h1 uint64, h2 uint64) {
-	d := digest128{h1: uint64(seed), h2: uint64(seed)}
+	d := Digest128{h1: uint64(seed), h2: uint64(seed)}
 	d.seed = seed
 	d.tail = d.bmix(data)
 	d.clen = len(data)
