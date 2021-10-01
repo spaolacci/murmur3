@@ -2,13 +2,14 @@ package murmur3
 
 import (
 	"hash"
+	"io"
 )
 
 // Make sure interfaces are correctly implemented.
 var (
-	_ hash.Hash   = new(Digest64)
-	_ hash.Hash64 = new(Digest64)
-	_ bmixer      = new(Digest64)
+	_ hash.Hash       = (*Digest64)(nil)
+	_ hash.Hash64     = (*Digest64)(nil)
+	_ io.StringWriter = (*Digest64)(nil)
 )
 
 // Digest64 is half a Digest128.
@@ -33,6 +34,21 @@ func (d *Digest64) Sum(b []byte) []byte {
 func (d *Digest64) Sum64() uint64 {
 	h1, _ := (*Digest128)(d).Sum128()
 	return h1
+}
+
+func (d *Digest64) Size() int { return 8 }
+
+func (d *Digest64) WriteString(s string) (int, error) {
+	return d.Write(unsafeStringToBytes(s))
+}
+
+func (d *Digest64) Write(b []byte) (int, error) {
+	return d.write(b, 16, (*Digest128)(d).bmix)
+}
+
+func (d *Digest64) Reset() {
+	d.reset()
+	d.h1, d.h2 = uint64(d.seed), uint64(d.seed)
 }
 
 // Sum64 returns the MurmurHash3 sum of data. It is equivalent to the

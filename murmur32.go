@@ -4,15 +4,16 @@ package murmur3
 
 import (
 	"hash"
+	"io"
 	"math/bits"
 	"unsafe"
 )
 
 // Make sure interfaces are correctly implemented.
 var (
-	_ hash.Hash   = new(Digest32)
-	_ hash.Hash32 = new(Digest32)
-	_ bmixer      = new(Digest32)
+	_ hash.Hash       = (*Digest32)(nil)
+	_ hash.Hash32     = (*Digest32)(nil)
+	_ io.StringWriter = (*Digest32)(nil)
 )
 
 const (
@@ -31,16 +32,26 @@ func New32() *Digest32 { return New32WithSeed(0) }
 
 // New32WithSeed returns new 32-bit hasher set with explicit seed value
 func New32WithSeed(seed uint32) *Digest32 {
-	d := new(Digest32)
-	d.seed = seed
-	d.bmixer = d
-	d.Reset()
-	return d
+	return &Digest32{
+		digest: digest{seed: seed},
+		h1:     seed,
+	}
+}
+
+func (d *Digest32) Reset() {
+	d.reset()
+	d.h1 = d.seed
 }
 
 func (d *Digest32) Size() int { return 4 }
 
-func (d *Digest32) reset() { d.h1 = d.seed }
+func (d *Digest32) WriteString(s string) (int, error) {
+	return d.Write(unsafeStringToBytes(s))
+}
+
+func (d *Digest32) Write(b []byte) (int, error) {
+	return d.write(b, d.Size(), d.bmix)
+}
 
 func (d *Digest32) Sum(b []byte) []byte {
 	h := d.Sum32()

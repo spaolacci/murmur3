@@ -1,8 +1,9 @@
 package murmur3
 
 import (
-	//"encoding/binary"
+	// "encoding/binary"
 	"hash"
+	"io"
 	"math/bits"
 	"unsafe"
 )
@@ -14,9 +15,9 @@ const (
 
 // Make sure interfaces are correctly implemented.
 var (
-	_ hash.Hash = new(Digest128)
-	_ Hash128   = new(Digest128)
-	_ bmixer    = new(Digest128)
+	_ hash.Hash       = (*Digest128)(nil)
+	_ Hash128         = (*Digest128)(nil)
+	_ io.StringWriter = (*Digest128)(nil)
 )
 
 // Hash128 represents a 128-bit hasher
@@ -38,16 +39,27 @@ func New128() *Digest128 { return New128WithSeed(0) }
 
 // New128WithSeed returns a 128-bit hasher set with explicit seed value
 func New128WithSeed(seed uint32) *Digest128 {
-	d := new(Digest128)
-	d.seed = seed
-	d.bmixer = d
-	d.Reset()
-	return d
+	return &Digest128{
+		digest: digest{seed: seed},
+		h1:     uint64(seed),
+		h2:     uint64(seed),
+	}
 }
 
 func (d *Digest128) Size() int { return 16 }
 
-func (d *Digest128) reset() { d.h1, d.h2 = uint64(d.seed), uint64(d.seed) }
+func (d *Digest128) WriteString(s string) (int, error) {
+	return d.Write(unsafeStringToBytes(s))
+}
+
+func (d *Digest128) Write(b []byte) (int, error) {
+	return d.write(b, d.Size(), d.bmix)
+}
+
+func (d *Digest128) Reset() {
+	d.reset()
+	d.h1, d.h2 = uint64(d.seed), uint64(d.seed)
+}
 
 func (d *Digest128) Sum(b []byte) []byte {
 	h1, h2 := d.Sum128()
