@@ -2,6 +2,7 @@ package murmur3
 
 import (
 	"fmt"
+	"io"
 	"strconv"
 	"testing"
 )
@@ -183,6 +184,22 @@ func Benchmark128(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				Sum128(buf)
+			}
+		})
+	}
+}
+
+func BenchmarkWriteString(b *testing.B) {
+	buf := make([]byte, 8192)
+	for length := 1; length <= cap(buf); length *= 2 {
+		b.Run(strconv.Itoa(length), func(b *testing.B) {
+			s := string(buf[:length])
+			h := New32()
+			b.SetBytes(int64(length))
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				io.WriteString(h, s)
 			}
 		})
 	}
