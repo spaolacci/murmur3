@@ -121,7 +121,7 @@ func Sum32WithSeed(data []byte, seed uint32) uint32 {
 	}
 	p1 := p + uintptr(4*nblocks)
 	for ; p < p1; p += 4 {
-		k1 := *(*uint32)(unsafe.Pointer(p))
+		k1 := *(*uint32)(unsafe.Pointer(&p))
 
 		k1 *= c1_32
 		k1 = bits.RotateLeft32(k1, 15)
