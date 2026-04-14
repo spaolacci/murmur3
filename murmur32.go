@@ -3,9 +3,9 @@ package murmur3
 // http://code.google.com/p/guava-libraries/source/browse/guava/src/com/google/common/hash/Murmur3_32HashFunction.java
 
 import (
+	"encoding/binary"
 	"hash"
 	"math/bits"
-	"unsafe"
 )
 
 // Make sure interfaces are correctly implemented.
@@ -53,7 +53,7 @@ func (d *digest32) bmix(p []byte) (tail []byte) {
 
 	nblocks := len(p) / 4
 	for i := 0; i < nblocks; i++ {
-		k1 := *(*uint32)(unsafe.Pointer(&p[i*4]))
+		k1 := binary.LittleEndian.Uint32(p[i*4:])
 
 		k1 *= c1_32
 		k1 = bits.RotateLeft32(k1, 15)
@@ -115,13 +115,8 @@ func Sum32WithSeed(data []byte, seed uint32) uint32 {
 	h1 := seed
 
 	nblocks := len(data) / 4
-	var p uintptr
-	if len(data) > 0 {
-		p = uintptr(unsafe.Pointer(&data[0]))
-	}
-	p1 := p + uintptr(4*nblocks)
-	for ; p < p1; p += 4 {
-		k1 := *(*uint32)(unsafe.Pointer(p))
+	for i := 0; i < nblocks; i++ {
+		k1 := binary.LittleEndian.Uint32(data[i*4:])
 
 		k1 *= c1_32
 		k1 = bits.RotateLeft32(k1, 15)
