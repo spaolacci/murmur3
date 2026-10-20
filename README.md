@@ -9,6 +9,37 @@ MurmurHash3).
 Reference algorithm has been slightly hacked as to support the streaming mode
 required by Go's standard [Hash interface](http://golang.org/pkg/hash/#Hash).
 
+Hexadecimal strings
+-------------------
+
+`Sum128WithSeed` returns two `uint64` values. Format each as 16 hexadecimal
+digits, in return order, to obtain a 32-character string:
+
+```go
+h1, h2 := murmur3.Sum128WithSeed([]byte("hello"), 42)
+fmt.Printf("%016x%016x\n", h1, h2)
+// c4b8b3c960af6f082334b875b0efbc7a
+```
+
+The zero padding matters: formatting each number with `%x` or
+`strconv.FormatUint` alone drops leading zeroes. For example, empty input with
+seed 0 produces 32 zeroes with the format above.
+
+For streaming input, format the bytes returned by `Sum(nil)` instead:
+
+```go
+h := murmur3.New128WithSeed(42)
+h.Write([]byte("hel"))
+h.Write([]byte("lo"))
+fmt.Printf("%x\n", h.Sum(nil))
+// c4b8b3c960af6f082334b875b0efbc7a
+```
+
+These snippets use `fmt` and `github.com/spaolacci/murmur3`. Both produce the
+same representation: the first returned word followed by the second, each in
+big-endian byte order, matching this package's `Sum` method. Other MurmurHash3
+implementations may use a different byte order when displaying a hash.
+
 
 Benchmarks
 ----------
